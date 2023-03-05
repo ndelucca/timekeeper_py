@@ -1,6 +1,7 @@
 """CLI Interface module"""
 
 import click
+from tabulate import tabulate
 
 from timekeeper.model import Times
 
@@ -23,9 +24,11 @@ def stop(times_model: Times):
 @click.pass_obj
 def show(times_model: Times):
     """Shows current registers"""
-    registers = times_model.query_times()
-    for items in registers:
-        print(items)
+
+    table = tabulate(
+        times_model.query_times(), headers=["Operation", "Date"], tablefmt="fancy_grid"
+    )
+    print(table)
 
 
 @click.command()
