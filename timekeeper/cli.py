@@ -1,30 +1,41 @@
 """CLI Interface module"""
 
 import click
+from timekeeper.database import open_db, register_in, register_out, query_times
+from timekeeper.times import now_rounded
 
 
 @click.command()
-def start():
+@click.pass_obj
+def start(obj: dict):
     """Signals the begining of the clock"""
-    click.echo("Started")
+
+    with open_db(obj.get("database")) as cursor:
+        register_in(cursor, now_rounded())
 
 
 @click.command()
-def stop():
+@click.pass_obj
+def stop(obj: dict):
     """Signals the end of the clock"""
-    click.echo("Stopped")
+    with open_db(obj.get("database")) as cursor:
+        register_out(cursor, now_rounded())
 
 
 @click.command()
-def show():
+@click.pass_obj
+def show(obj: dict):
     """Shows current registers"""
-    click.echo("Show")
+    with open_db(obj.get("database")) as cursor:
+        query_times(cursor)
 
 
 @click.group(commands=[start, stop, show])
-def cli():
+@click.pass_context
+def cli(context=None):
     """CLI Runner group"""
-    pass
+
+    context.obj = {"database": "timekeeper.db"}
 
 
 if __name__ == "__main__":
