@@ -1,7 +1,7 @@
 """Time management utils"""
 from datetime import datetime
 
-ROUND_INTERVAL = 15
+ROUND_INTERVAL = 5
 
 
 def round_minutes(minutes: int, interval: int = ROUND_INTERVAL) -> int:
@@ -13,4 +13,6 @@ def now_rounded(interval: int = ROUND_INTERVAL) -> datetime:
     """Returns a rounded minutes now datetime"""
     now = datetime.now()
     current_minutes = now.minute
-    return now.replace(minute=round_minutes(current_minutes, interval))
+    return now.replace(
+        minute=round_minutes(current_minutes, interval), second=0, microsecond=0
+    )
