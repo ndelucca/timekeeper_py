@@ -2,3 +2,5 @@
 !.venv/.persist
 *.db
 *__pycache__*
+*build/
+*egg-info/
