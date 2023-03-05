@@ -1,3 +1,5 @@
+"""Database module"""
+
 import datetime
 import sqlite3
 import logging
