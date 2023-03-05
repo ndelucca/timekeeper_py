@@ -2,41 +2,45 @@
 
 import click
 
-from timekeeper.database import open_db, query_times, register_in, register_out
-from timekeeper.times import now_rounded
+from timekeeper.model import Times
 
 
 @click.command()
 @click.pass_obj
-def start(obj: dict):
+def start(times_model: Times):
     """Signals the begining of the clock"""
-
-    with open_db(obj.get("database")) as cursor:
-        register_in(cursor, now_rounded())
+    times_model.register_in()
 
 
 @click.command()
 @click.pass_obj
-def stop(obj: dict):
+def stop(times_model: Times):
     """Signals the end of the clock"""
-    with open_db(obj.get("database")) as cursor:
-        register_out(cursor, now_rounded())
+    times_model.register_out()
 
 
 @click.command()
 @click.pass_obj
-def show(obj: dict):
+def show(times_model: Times):
     """Shows current registers"""
-    with open_db(obj.get("database")) as cursor:
-        query_times(cursor)
+    registers = times_model.query_times()
+    for items in registers:
+        print(items)
 
 
-@click.group(commands=[start, stop, show])
+@click.command()
+@click.pass_obj
+def drop(times_model: Times):
+    """Destroys all registers"""
+    times_model.clear_db()
+
+
+@click.group(commands=[start, stop, show, drop])
 @click.pass_context
 def cli(context=None):
     """CLI Runner group"""
 
-    context.obj = {"database": "timekeeper.db"}
+    context.obj = Times("timekeeper.db")
 
 
 if __name__ == "__main__":
