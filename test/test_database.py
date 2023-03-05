@@ -21,4 +21,4 @@ def test_open_db():
         cursor.execute(SELECT_STATEMENT)
         cursor.execute(DROP_STATEMENT)
 
-    os.remove("test.db")
+    os.remove(TEST_DATABASE)

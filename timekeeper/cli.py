@@ -36,11 +36,20 @@ def drop(times_model: Times):
 
 
 @click.group(commands=[start, stop, show, drop])
+@click.version_option(None, "--version", package_name="timekeeper")
+@click.option(
+    "--database",
+    "-db",
+    "database",
+    default="timekeeper.db",
+    type=str,
+    help="Database filename",
+)
 @click.pass_context
-def cli(context=None):
+def cli(context=None, database: str = None):
     """CLI Runner group"""
 
-    context.obj = Times("timekeeper.db")
+    context.obj = Times(database)
 
 
 if __name__ == "__main__":
