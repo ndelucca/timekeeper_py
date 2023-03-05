@@ -1,7 +1,8 @@
 """CLI Interface module"""
 
 import click
-from timekeeper.database import open_db, register_in, register_out, query_times
+
+from timekeeper.database import open_db, query_times, register_in, register_out
 from timekeeper.times import now_rounded
 
 

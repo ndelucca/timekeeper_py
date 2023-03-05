@@ -1,3 +1,5 @@
+.vscode/*
+!.vscode/project.code-workspace
 .venv/*
 !.venv/.persist
 *.db

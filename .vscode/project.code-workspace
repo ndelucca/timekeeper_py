@@ -2,11 +2,28 @@
     "folders": [
         {
             "path": ".."
-        },
+        }
     ],
     "settings": {
-        "python.formatting.provider": "black",
+        "files.eol": "\n",
+        "files.encoding": "utf8",
+        "editor.renderWhitespace": "all",
+        "editor.tabSize": 4,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true,
+        },
+        "editor.formatOnSave": true,
+        "editor.rulers": [
+            80,
+            120
+        ],
+        "workbench.colorCustomizations": {
+            "titleBar.activeBackground": "#483c85"
+        },
+        "python.linting.enabled": true,
         "python.linting.pylintEnabled": true,
-        "python.linting.enabled": true
+        "python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
+        "python.formatting.blackPath": "${workspaceFolder}/.venv/bin/black",
+        "python.formatting.provider": "black",
     }
 }

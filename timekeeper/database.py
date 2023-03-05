@@ -67,28 +67,3 @@ def query_times(cursor: Cursor) -> any:
         reg_operation = row[0]
         reg_date = row[1]
         print(f"Operation: {reg_operation} Datetime: {reg_date} Type: {type(reg_date)}")
-
-
-ROUND_INTERVAL = 15
-
-
-def round_minutes(minutes: int):
-    return ROUND_INTERVAL * int(minutes / ROUND_INTERVAL)
-
-
-def main():
-    """To be moved"""
-    now = datetime.datetime.now()
-    current_minutes = now.minute
-    altered = now.replace(minute=round_minutes(current_minutes))
-
-    with open_db(DB_NAME) as cursor:
-        register_in(cursor, altered)
-        register_out(cursor, altered)
-        register_in(cursor, altered)
-        register_out(cursor, altered)
-        query_times(cursor)
-
-
-if __name__ == "__main__":
-    main()
