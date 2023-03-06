@@ -26,7 +26,7 @@ def show(times_model: Times):
     """Shows current registers"""
 
     table = tabulate(
-        times_model.query_times(), headers=["Operation", "Date"], tablefmt="fancy_grid"
+        times_model.query_all(), headers=["Operation", "Date"], tablefmt="fancy_grid"
     )
     print(table)
 

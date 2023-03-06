@@ -7,13 +7,10 @@ from timekeeper.database import open_db
 from timekeeper.times import now_rounded
 
 TABLE_NAME = "times"
-INSERT_STATEMENT = f"INSERT INTO {TABLE_NAME} (`operation`,`date`) VALUES (?, ?);"
-DROP_STATEMENT = f"DROP TABLE {TABLE_NAME}"
-SELECT_STATEMENT = f"SELECT `operation`,`date` FROM {TABLE_NAME}"
-CREATE_STATEMENT = f"""CREATE TABLE IF NOT EXISTS {TABLE_NAME} (
-    id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-    operation TEXT CHECK( operation IN ('IN','OUT') ) NOT NULL,
-    date TIMESTAMP);"""
+
+
+class TimekeeperModelError(Exception):
+    """database module exception"""
 
 
 class Times:
@@ -21,6 +18,7 @@ class Times:
 
     database: str
     connection: callable
+    table: str = TABLE_NAME
 
     def __init__(self, database):
         self.database = database
@@ -31,27 +29,55 @@ class Times:
     def initialize_db(self) -> None:
         """Creates the timekeeper database and tables"""
         with self.connection() as cursor:
-            cursor.execute(CREATE_STATEMENT)
+            try:
+                cursor.execute(
+                    f"""CREATE TABLE IF NOT EXISTS `{self.table}` (
+                    id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    operation TEXT CHECK( operation IN ('IN','OUT') ) NOT NULL,
+                    date TIMESTAMP);"""
+                )
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
 
-    def register_in(self, date: datetime = now_rounded()):
-        """Registers a user entrance"""
+    def register_row(self, operation: str, date: datetime) -> None:
+        """Registers a row"""
+
         with self.connection() as cursor:
-            cursor.execute(INSERT_STATEMENT, ("IN", date))
+            try:
+                cursor.execute(
+                    f"INSERT INTO `{self.table}` (`operation`,`date`) VALUES (?, ?);",
+                    (operation, date),
+                )
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
+    def register_in(self, date: datetime = now_rounded()) -> None:
+        """Registers a user entrance"""
+        self.register_row("IN", date)
 
     def register_out(self, date: datetime = now_rounded()) -> None:
         """Registers a user exit"""
-        with self.connection() as cursor:
-            cursor.execute(INSERT_STATEMENT, ("OUT", date))
+        self.register_row("OUT", date)
 
     def clear_db(self) -> None:
         """Clears the database tables"""
         with self.connection() as cursor:
-            cursor.execute(DROP_STATEMENT)
+            try:
+                cursor.execute(f"DROP TABLE `{self.table}`;")
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
 
-    def query_times(self, filters=None) -> list[list]:
+    def query_all(self) -> list[list]:
         """Queries all registers"""
-        with self.connection() as cursor:
-            cursor.execute(SELECT_STATEMENT)
-            fetched_data = cursor.fetchall()
 
-        return fetched_data
+        with self.connection() as cursor:
+            try:
+                cursor.execute(f"SELECT `operation`,`date` FROM `{self.table}`;")
+                fetched_data = cursor.fetchall()
+                return fetched_data
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
+    def query_day(self, day: datetime) -> list[datetime]:
+        """Returns all registers related to a single day"""
+        pass

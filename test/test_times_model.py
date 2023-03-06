@@ -12,7 +12,7 @@ def test_times_instance():
     times = Times(TEST_DATABASE)
     times.register_in()
     times.register_out()
-    times.query_times()
+    times.query_all()
     times.clear_db()
 
     os.remove(TEST_DATABASE)
