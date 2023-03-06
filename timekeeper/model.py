@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from functools import partial
-
+from typing import List
 from timekeeper.database import open_db
 from timekeeper.times import now_rounded
 
@@ -67,7 +67,7 @@ class Times:
             except Exception as db_error:
                 raise TimekeeperModelError from db_error
 
-    def query_all(self) -> list[list]:
+    def query_all(self) -> List[list]:
         """Queries all registers"""
 
         with self.connection() as cursor:
@@ -78,6 +78,6 @@ class Times:
             except Exception as db_error:
                 raise TimekeeperModelError from db_error
 
-    def query_day(self, day: datetime) -> list[datetime]:
+    def query_day(self, day: datetime) -> List[datetime]:
         """Returns all registers related to a single day"""
         pass
