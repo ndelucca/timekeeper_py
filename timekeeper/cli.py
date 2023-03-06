@@ -1,5 +1,7 @@
 """CLI Interface module"""
 
+from datetime import datetime
+
 import click
 from tabulate import tabulate
 
@@ -33,12 +35,23 @@ def show(times_model: Times):
 
 @click.command()
 @click.pass_obj
+def today(times_model: Times):
+    """Shows current registers"""
+
+    day = times_model.query_day(datetime.now())
+    table = tabulate(
+        [day.tuple(),], headers=["Day", "In", "Out", "Total"], tablefmt="fancy_grid"
+    )
+    print(table)
+
+@click.command()
+@click.pass_obj
 def drop(times_model: Times):
     """Destroys all registers"""
     times_model.clear_db()
 
 
-@click.group(commands=[start, stop, show, drop])
+@click.group(commands=[start, stop, show, drop, today])
 @click.version_option(None, "--version", package_name="timekeeper")
 @click.option(
     "--database",
