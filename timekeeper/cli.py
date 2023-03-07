@@ -69,8 +69,15 @@ def stop(times_model: Times) -> None:
     "--legajo",
     "-l",
     "legajo",
-    type=int,
-    default=76,  # My code
+    type=str,
+    default="76",  # My code
+)
+@click.option(
+    "--user-login"
+    "-u",
+    "user_login",
+    type=str,
+    default="ndelucca",  # My user login
 )
 @click.pass_obj
 def show(
@@ -80,7 +87,8 @@ def show(
     today: bool = False,
     raw: bool = False,
     inform_remote: bool = False,
-    legajo: int = None,
+    legajo: str = None,
+    user_login: str = None,
 ) -> None:
     """Shows current registers"""
 
@@ -136,7 +144,12 @@ def show(
     if inform_remote:
         click.echo("Communicating to remote...")
         for day in days:
-            click.secho(Hiper.register_date(day, legajo), fg="green")
+            comm = Hiper.register_date(day, legajo, user_login)
+            if comm:
+                click.secho(f"{day.day_str()} informed correctly", fg="green")
+            else:
+                click.secho(f"{day.day_str()} could not be informed", fg="red")
+
         click.echo("Communication finished...")
 
 
