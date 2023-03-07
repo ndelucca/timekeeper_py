@@ -1,6 +1,5 @@
 """Time management utils"""
 from datetime import datetime
-from typing import List
 
 ROUND_INTERVAL = 5
 

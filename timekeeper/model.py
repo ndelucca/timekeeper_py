@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
-from typing import List
+from typing import List, Callable
 
 from timekeeper.database import open_db
 from timekeeper.times import now_rounded
@@ -62,7 +62,7 @@ class Times:
     """Represents the timekeeping table model"""
 
     database: str
-    connection: callable
+    connection: Callable
     table: str = TABLE_NAME
 
     def __init__(self, database):
