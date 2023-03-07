@@ -13,6 +13,7 @@ TABLE_NAME = "times"
 DATE_FMT = "%Y-%m-%d"
 TIME_FMT = "%H:%M"
 
+
 class TimekeeperModelError(Exception):
     """database module exception"""
 
@@ -36,13 +37,12 @@ class Day:
             logging.warning(f"IN {ins} != OUT {outs}")
 
         delta: timedelta = timedelta()
-        for rin,rout in zip(ins,outs):
-            delta+=rout-rin
+        for rin, rout in zip(ins, outs):
+            delta += rout - rin
 
-        return Day(in_dt=ins[0], out_dt=ins[0]+delta, hours=delta)
+        return Day(in_dt=ins[0], out_dt=ins[0] + delta, hours=delta)
 
     def __str__(self) -> str:
-
         return "{day}: {time_in} - {time_out}".format(
             day=self.in_dt.strftime(DATE_FMT),
             time_in=self.in_dt.strftime(TIME_FMT),
@@ -54,9 +54,8 @@ class Day:
             self.in_dt.strftime(DATE_FMT),
             self.in_dt.strftime(TIME_FMT),
             self.out_dt.strftime(TIME_FMT),
-            self.hours
+            self.hours,
         )
-
 
 
 class Times:
@@ -113,39 +112,49 @@ class Times:
             except Exception as db_error:
                 raise TimekeeperModelError from db_error
 
-    def query_all(self) -> List[list]:
+    def query_all(self, filters: dict = None) -> List[list]:
         """Queries all registers"""
 
+        if filters is None:
+            filters = {}
+
+        where = []
+        binds = []
+
+        if filters.get("date_from"):
+            where.append(f"`date` >= ?")
+            binds.append(filters.get("date_from"))
+
+        if filters.get("date_to"):
+            where.append(f"`date` < ?")
+            binds.append(filters.get("date_to"))
+
         with self.connection() as cursor:
+            query = f"SELECT `operation`,`date` FROM `{self.table}`"
+            if where:
+                query += f"WHERE {' AND '.join(where)}"
+
             try:
-                cursor.execute(f"SELECT `operation`,`date` FROM `{self.table}`;")
+                cursor.execute(query, binds)
                 fetched_data = cursor.fetchall()
                 return fetched_data
             except Exception as db_error:
                 raise TimekeeperModelError from db_error
 
-    def query_day(self, day: datetime) -> Day:
-        """Returns all registers related to a single day"""
-
-        with self.connection() as cursor:
-            try:
-                cursor.execute(
-                    f"""SELECT `operation`,GROUP_CONCAT(`date`) FROM `{self.table}`
-                WHERE `date` LIKE ? GROUP BY `operation`;""",
-                    (f"%{day.date()}%",),
-                )
-                fetched_data = cursor.fetchall()
-
-                if not fetched_data:
-                    return []
-
-            except Exception as db_error:
-                raise TimekeeperModelError from db_error
+    def query_days(self, filters: dict = None) -> List[Day]:
+        """Returns filtered registers as days"""
+        query = self.query_all(filters)
 
         days = {}
-        for operation, times in fetched_data:
-            days[operation] = [
-                datetime.fromisoformat(time) for time in times.split(",")
-            ]
+        for reg_operation, reg_date in query:
+            day_key = reg_date.strftime("%Y-%m-%d")
 
-        return Day.from_dict(days)
+            if not days.get(day_key):
+                days[day_key] = {}
+
+            if not days[day_key].get(reg_operation):
+                days[day_key][reg_operation] = []
+
+            days[day_key][reg_operation].append(reg_date)
+
+        return [Day.from_dict(day) for day in days.values()]
