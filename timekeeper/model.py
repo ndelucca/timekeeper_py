@@ -57,6 +57,15 @@ class Day:
             self.hours,
         )
 
+    def day_str(self) -> str:
+        return self.in_dt.strftime(DATE_FMT)
+
+    def time_in_str(self) -> str:
+        return self.in_dt.strftime(TIME_FMT)
+
+    def time_out_str(self) -> str:
+        return self.out_dt.strftime(TIME_FMT)
+
 
 class Times:
     """Represents the timekeeping table model"""
@@ -126,7 +135,7 @@ class Times:
             binds.append(filters.get("date_from"))
 
         if filters.get("date_to"):
-            where.append(f"`date` < ?")
+            where.append(f"`date` <= ?")
             binds.append(filters.get("date_to"))
 
         with self.connection() as cursor:
@@ -143,7 +152,7 @@ class Times:
 
     def query_days(self, filters: dict = None) -> List[Day]:
         """Returns filtered registers as days"""
-        query = self.query_all(filters)
+        query = self.query_all(filters=filters)
 
         days = {}
         for reg_operation, reg_date in query:

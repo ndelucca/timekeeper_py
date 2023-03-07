@@ -7,6 +7,7 @@ import click
 from tabulate import tabulate
 
 from timekeeper.model import Times
+from timekeeper.remote import Hiper
 
 
 def header_style(text: str) -> str:
@@ -57,6 +58,20 @@ def stop(times_model: Times) -> None:
     is_flag=True,
     help="Shows database registers with no modification",
 )
+@click.option(
+    "--inform",
+    "-i",
+    "inform_remote",
+    is_flag=True,
+    help="Registers the filtered days to a remote server",
+)
+@click.option(
+    "--legajo",
+    "-l",
+    "legajo",
+    type=int,
+    default=76,  # My code
+)
 @click.pass_obj
 def show(
     times_model: Times,
@@ -64,18 +79,22 @@ def show(
     date_to: datetime,
     today: bool = False,
     raw: bool = False,
+    inform_remote: bool = False,
+    legajo: int = None,
 ) -> None:
     """Shows current registers"""
 
-    filters = {
-        "date_from": date_from,
-        "date_to": date_to,
-    }
+    filters = {}
+
+    if date_from:
+        filters["date_from"] = f"{date_from} 00:00:00"
+    if date_to:
+        filters["date_to"] = f"{date_to} 23:59:59"
 
     if today:
         filters = {
-            "date_from": datetime.today().strftime("%Y-%m-%d"),
-            "date_to": datetime.today().strftime("%Y-%m-%d"),
+            "date_from": datetime.today().strftime("%Y-%m-%d 00:00:00"),
+            "date_to": datetime.today().strftime("%Y-%m-%d 23:59:59"),
         }
 
     if raw:
@@ -87,14 +106,14 @@ def show(
 
         click.echo(
             tabulate(
-                times_model.query_all(filters),
+                times_model.query_all(filters=filters),
                 headers=[header_style("Operation"), header_style("Date")],
                 tablefmt="fancy_grid",
             )
         )
         return
 
-    days = times_model.query_days(filters)
+    days = times_model.query_days(filters=filters)
 
     if not days:
         click.secho("No registers available", fg="yellow")
@@ -113,6 +132,12 @@ def show(
         ),
         fg="green",
     )
+
+    if inform_remote:
+        click.echo("Communicating to remote...")
+        for day in days:
+            click.secho(Hiper.register_date(day, legajo), fg="green")
+        click.echo("Communication finished...")
 
 
 @click.command()
