@@ -30,11 +30,17 @@ class Day:
     def from_dict(cls, times: dict) -> "Day":
         """Creates a Day from a dict with multiple IN and OUT registers"""
 
-        ins: list = times.get("IN")
-        outs: list = times.get("OUT")
+        ins: list = times.get("IN", [])
+        outs: list = times.get("OUT", [])
 
-        if len(ins) != len(outs):
-            logging.warning(f"IN {ins} != OUT {outs}")
+        if len(ins) > len(outs):
+            logging.warning(
+                (
+                    f"Seems you haven't closed this cicle.\n"
+                    f"In: {','.join([str(dt) for dt in ins])}\n"
+                    f"Out:{','.join([str(dt) for dt in outs])}\n"
+                )
+            )
 
         delta: timedelta = timedelta()
         for rin, rout in zip(ins, outs):
