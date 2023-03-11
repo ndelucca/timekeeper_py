@@ -20,6 +20,7 @@ def header_style(text: str) -> str:
 def start(times_model: Times) -> None:
     """Signals the begining of the clock"""
     times_model.register_in()
+    click.echo("Hi bro.")
 
 
 @click.command()
@@ -27,6 +28,7 @@ def start(times_model: Times) -> None:
 def stop(times_model: Times) -> None:
     """Signals the end of the clock"""
     times_model.register_out()
+    click.echo("Bye bro.")
 
 
 @click.command()
