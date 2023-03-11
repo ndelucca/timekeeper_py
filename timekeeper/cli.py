@@ -8,7 +8,7 @@ from tabulate import tabulate
 
 from timekeeper.model import Times
 from timekeeper.remote import Hiper
-
+from timekeeper.notification import send_notification
 
 def header_style(text: str) -> str:
     partial_func = partial(click.style, fg="green", bold=True)
@@ -20,6 +20,7 @@ def header_style(text: str) -> str:
 def start(times_model: Times) -> None:
     """Signals the begining of the clock"""
     times_model.register_in()
+    send_notification("Hi Bro!")
     click.echo("Hi bro.")
 
 
@@ -28,6 +29,7 @@ def start(times_model: Times) -> None:
 def stop(times_model: Times) -> None:
     """Signals the end of the clock"""
     times_model.register_out()
+    send_notification("Bye Bro!")
     click.echo("Bye bro.")
 
 
