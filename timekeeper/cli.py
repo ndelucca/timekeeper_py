@@ -7,8 +7,9 @@ import click
 from tabulate import tabulate
 
 from timekeeper.model import Times
-from timekeeper.remote import Hiper
 from timekeeper.notification import send_notification
+from timekeeper.remote import Hiper
+
 
 def header_style(text: str) -> str:
     partial_func = partial(click.style, fg="green", bold=True)
@@ -16,21 +17,41 @@ def header_style(text: str) -> str:
 
 
 @click.command()
+@click.option(
+    "--date",
+    "-d",
+    "date",
+    type=click.DateTime(formats=["%Y-%m-%d %H:%M"]),
+    default=None,
+)
 @click.pass_obj
-def start(times_model: Times) -> None:
+def start(times_model: Times, date: None) -> None:
     """Signals the begining of the clock"""
-    times_model.register_in()
-    send_notification("Hi Bro!")
-    click.echo("Hi bro.")
+    if date:
+        times_model.register_in(date)
+    else:
+        times_model.register_in()
+        send_notification("Hi Bro!")
+        click.echo("Hi bro.")
 
 
 @click.command()
+@click.option(
+    "--date",
+    "-d",
+    "date",
+    type=click.DateTime(formats=["%Y-%m-%d %H:%M"]),
+    default=None,
+)
 @click.pass_obj
-def stop(times_model: Times) -> None:
+def stop(times_model: Times, date: None) -> None:
     """Signals the end of the clock"""
-    times_model.register_out()
-    send_notification("Bye Bro!")
-    click.echo("Bye bro.")
+    if date:
+        times_model.register_out(date)
+    else:
+        times_model.register_out()
+        send_notification("Bye Bro!")
+        click.echo("Bye bro.")
 
 
 @click.command()
@@ -77,7 +98,7 @@ def stop(times_model: Times) -> None:
     default="76",  # My code
 )
 @click.option(
-    "--user-login"
+    "--user-login",
     "-u",
     "user_login",
     type=str,
