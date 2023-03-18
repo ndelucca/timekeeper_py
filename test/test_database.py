@@ -3,7 +3,7 @@ import os
 
 from timekeeper.database import open_db
 
-TEST_DATABASE = "test.db"
+TEST_DATABASE = "test_database.db"
 TEST_TABLE = "test_times"
 
 CREATE_STATEMENT = f"""CREATE TABLE IF NOT EXISTS `{TEST_TABLE}` (

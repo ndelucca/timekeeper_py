@@ -120,6 +120,17 @@ class Times:
         """Registers a user exit"""
         self.register_row("OUT", date)
 
+    def remove_register(self, date: datetime) -> None:
+        """Removes a all registers related to a day"""
+        with self.connection() as cursor:
+            try:
+                cursor.execute(
+                    f"DELETE FROM `{self.table}` WHERE `date` LIKE ?;",
+                    (f"{date.strftime('%Y-%m-%d')}%",),
+                )
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
     def clear_db(self) -> None:
         """Clears the database tables"""
         with self.connection() as cursor:
