@@ -1,6 +1,5 @@
-"""CLI Interface module"""
+"""Show Interface module"""
 
-import os
 from datetime import datetime
 from functools import partial
 
@@ -8,51 +7,13 @@ import click
 from tabulate import tabulate
 
 from timekeeper.model import Times
-from timekeeper.notification import send_notification
 from timekeeper.remote import Hiper
 
 
 def header_style(text: str) -> str:
+    """Helper styling function"""
     partial_func = partial(click.style, fg="green", bold=True)
     return partial_func(text)
-
-
-@click.command()
-@click.option(
-    "--date",
-    "-d",
-    "date",
-    type=click.DateTime(formats=["%Y-%m-%d %H:%M"]),
-    default=None,
-)
-@click.pass_obj
-def start(times_model: Times, date: None) -> None:
-    """Signals the begining of the clock"""
-    if date:
-        times_model.register_in(date)
-    else:
-        times_model.register_in()
-        send_notification("Hi Bro!")
-        click.echo("Hi bro.")
-
-
-@click.command()
-@click.option(
-    "--date",
-    "-d",
-    "date",
-    type=click.DateTime(formats=["%Y-%m-%d %H:%M"]),
-    default=None,
-)
-@click.pass_obj
-def stop(times_model: Times, date: None) -> None:
-    """Signals the end of the clock"""
-    if date:
-        times_model.register_out(date)
-    else:
-        times_model.register_out()
-        send_notification("Bye Bro!")
-        click.echo("Bye bro.")
 
 
 @click.command()
@@ -177,34 +138,3 @@ def show(
                 click.secho(f"{day.day_str()} could not be informed", fg="red")
 
         click.echo("Communication finished...")
-
-
-@click.command()
-@click.pass_obj
-def drop(times_model: Times) -> None:
-    """Destroys all registers"""
-    times_model.clear_db()
-
-
-@click.group(commands=[start, stop, show, drop])
-@click.version_option(None, "--version", package_name="timekeeper")
-@click.option(
-    "--database",
-    "-db",
-    "database",
-    type=str,
-    help="Database filename",
-)
-@click.pass_context
-def cli(context=None, database: str = None) -> None:
-    """CLI Runner group"""
-
-    db_name = os.path.join("~", "timekeeper.db")
-    if database:
-        db_name = database
-
-    context.obj = Times(db_name)
-
-
-if __name__ == "__main__":
-    cli()

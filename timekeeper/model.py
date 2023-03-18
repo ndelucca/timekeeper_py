@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from functools import partial
-from typing import List, Callable
+from typing import Callable, List
 
 from timekeeper.database import open_db
 from timekeeper.times import now_rounded
