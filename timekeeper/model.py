@@ -35,11 +35,9 @@ class Day:
 
         if len(ins) > len(outs):
             logging.warning(
-                (
-                    f"Seems you haven't closed this cicle.\n"
-                    f"In: {','.join([str(dt) for dt in ins])}\n"
-                    f"Out:{','.join([str(dt) for dt in outs])}\n"
-                )
+                "Seems you haven't closed this cicle.\nIn: %s\nOut:%s\n",
+                ",".join([str(dt) for dt in ins]),
+                ",".join([str(dt) for dt in outs]),
             )
 
         delta: timedelta = timedelta()
@@ -49,13 +47,13 @@ class Day:
         return Day(in_dt=ins[0], out_dt=ins[0] + delta, hours=delta)
 
     def __str__(self) -> str:
-        return "{day}: {time_in} - {time_out}".format(
-            day=self.in_dt.strftime(DATE_FMT),
-            time_in=self.in_dt.strftime(TIME_FMT),
-            time_out=self.out_dt.strftime(TIME_FMT),
-        )
+        day = self.in_dt.strftime(DATE_FMT)
+        time_in = self.in_dt.strftime(TIME_FMT)
+        time_out = self.out_dt.strftime(TIME_FMT)
+        return f"{day}: {time_in} - {time_out}"
 
     def tuple(self) -> tuple:
+        """Returns the object represented as a tuple"""
         return (
             self.in_dt.strftime(DATE_FMT),
             self.in_dt.strftime(TIME_FMT),
@@ -64,12 +62,15 @@ class Day:
         )
 
     def day_str(self) -> str:
+        """Returns the day as a formated string"""
         return self.in_dt.strftime(DATE_FMT)
 
     def time_in_str(self) -> str:
+        """Returns the in time as a formated string"""
         return self.in_dt.strftime(TIME_FMT)
 
     def time_out_str(self) -> str:
+        """Returns the out time as a formated string"""
         return self.out_dt.strftime(TIME_FMT)
 
 
@@ -137,11 +138,11 @@ class Times:
         binds = []
 
         if filters.get("date_from"):
-            where.append(f"`date` >= ?")
+            where.append("`date` >= ?")
             binds.append(filters.get("date_from"))
 
         if filters.get("date_to"):
-            where.append(f"`date` <= ?")
+            where.append("`date` <= ?")
             binds.append(filters.get("date_to"))
 
         with self.connection() as cursor:
