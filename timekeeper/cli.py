@@ -1,5 +1,6 @@
 """CLI Interface module"""
 
+import os
 from datetime import datetime
 from functools import partial
 
@@ -191,7 +192,6 @@ def drop(times_model: Times) -> None:
     "--database",
     "-db",
     "database",
-    default="timekeeper.db",
     type=str,
     help="Database filename",
 )
@@ -199,7 +199,11 @@ def drop(times_model: Times) -> None:
 def cli(context=None, database: str = None) -> None:
     """CLI Runner group"""
 
-    context.obj = Times(database)
+    db_name = os.path.join("~", "timekeeper.db")
+    if database:
+        db_name = database
+
+    context.obj = Times(db_name)
 
 
 if __name__ == "__main__":
