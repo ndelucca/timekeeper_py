@@ -6,7 +6,7 @@ from functools import partial
 import click
 from tabulate import tabulate
 
-from timekeeper.config import Config
+from timekeeper.cli.session import CliSession
 from timekeeper.remote import Hiper
 
 
@@ -54,7 +54,7 @@ def header_style(text: str) -> str:
 )
 @click.pass_obj
 def show(
-    conf: Config,
+    session: CliSession,
     date_from: datetime,
     date_to: datetime,
     today: bool = False,
@@ -77,7 +77,7 @@ def show(
         }
 
     if raw:
-        registers = conf.model.query_all(filters)
+        registers = session.times_model.query_all(filters)
 
         if not registers:
             click.secho("No registers available", fg="yellow")
@@ -85,14 +85,14 @@ def show(
 
         click.echo(
             tabulate(
-                conf.model.query_all(filters=filters),
+                session.times_model.query_all(filters=filters),
                 headers=[header_style("Operation"), header_style("Date")],
                 tablefmt="fancy_grid",
             )
         )
         return
 
-    days = conf.model.query_days(filters=filters)
+    days = session.times_model.query_days(filters=filters)
 
     if not days:
         click.secho("No registers available", fg="yellow")
@@ -115,7 +115,9 @@ def show(
     if inform_remote:
         click.echo("Communicating to remote...")
         for day in days:
-            comm = Hiper.register_date(day, conf.hiper["legajo"], conf.hiper["user"])
+            comm = Hiper.register_date(
+                day, session.hiper["legajo"], session.hiper["user"]
+            )
             if comm:
                 click.secho(f"{day.day_str()} informed correctly", fg="green")
             else:

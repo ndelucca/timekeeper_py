@@ -3,10 +3,10 @@
 import click
 
 from timekeeper.cli.drop import drop
+from timekeeper.cli.session import CliSession
 from timekeeper.cli.show import show
 from timekeeper.cli.start import start
 from timekeeper.cli.stop import stop
-from timekeeper.config import Config
 
 
 @click.group(commands=[start, stop, show, drop])
@@ -15,7 +15,7 @@ from timekeeper.config import Config
 def cli(context=None) -> None:
     """CLI Runner group"""
 
-    context.obj = Config()
+    context.obj = CliSession()
 
 
 if __name__ == "__main__":

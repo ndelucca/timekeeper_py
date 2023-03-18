@@ -5,8 +5,6 @@ from dataclasses import dataclass, field
 
 from click import ClickException
 
-from timekeeper.model import Times
-
 CONFIG_TEMPLATE = """
 [hiper]
 legajo = 00
@@ -22,14 +20,10 @@ class ConfigError(ClickException):
 class Config:
     """Timekeeper Configuration object"""
 
-    model: Times = field(init=False)
     hiper: dict = field(init=False)
 
     def __post_init__(self):
         home = os.path.expanduser("~")
-
-        database = os.path.join(home, "timekeeper.db")
-        self.model = Times(database)
 
         configuration = os.path.join(home, "timekeeper.conf")
         if not os.path.exists(configuration):

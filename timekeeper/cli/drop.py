@@ -2,11 +2,11 @@
 
 import click
 
-from timekeeper.model import Times
+from timekeeper.cli.session import CliSession
 
 
 @click.command()
 @click.pass_obj
-def drop(times_model: Times) -> None:
+def drop(session: CliSession) -> None:
     """Destroys all registers"""
-    times_model.clear_db()
+    session.times_model.clear_db()

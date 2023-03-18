@@ -2,7 +2,7 @@
 
 import click
 
-from timekeeper.config import Config
+from timekeeper.cli.session import CliSession
 from timekeeper.notification import send_notification
 
 
@@ -15,11 +15,11 @@ from timekeeper.notification import send_notification
     default=None,
 )
 @click.pass_obj
-def stop(conf: Config, date: None) -> None:
+def stop(session: CliSession, date: None) -> None:
     """Signals the end of the clock"""
     if date:
-        conf.model.register_out(date)
+        session.times_model.register_out(date)
     else:
-        conf.model.register_out()
+        session.times_model.register_out()
         send_notification("Bye Bro!")
         click.echo("Bye bro.")
