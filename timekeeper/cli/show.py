@@ -6,7 +6,7 @@ from functools import partial
 import click
 from tabulate import tabulate
 
-from timekeeper.model import Times
+from timekeeper.config import Config
 from timekeeper.remote import Hiper
 
 
@@ -52,30 +52,14 @@ def header_style(text: str) -> str:
     is_flag=True,
     help="Registers the filtered days to a remote server",
 )
-@click.option(
-    "--legajo",
-    "-l",
-    "legajo",
-    type=str,
-    default="76",  # My code
-)
-@click.option(
-    "--user-login",
-    "-u",
-    "user_login",
-    type=str,
-    default="ndelucca",  # My user login
-)
 @click.pass_obj
 def show(
-    times_model: Times,
+    conf: Config,
     date_from: datetime,
     date_to: datetime,
     today: bool = False,
     raw: bool = False,
     inform_remote: bool = False,
-    legajo: str = None,
-    user_login: str = None,
 ) -> None:
     """Shows current registers"""
 
@@ -93,7 +77,7 @@ def show(
         }
 
     if raw:
-        registers = times_model.query_all(filters)
+        registers = conf.model.query_all(filters)
 
         if not registers:
             click.secho("No registers available", fg="yellow")
@@ -101,14 +85,14 @@ def show(
 
         click.echo(
             tabulate(
-                times_model.query_all(filters=filters),
+                conf.model.query_all(filters=filters),
                 headers=[header_style("Operation"), header_style("Date")],
                 tablefmt="fancy_grid",
             )
         )
         return
 
-    days = times_model.query_days(filters=filters)
+    days = conf.model.query_days(filters=filters)
 
     if not days:
         click.secho("No registers available", fg="yellow")
@@ -131,7 +115,7 @@ def show(
     if inform_remote:
         click.echo("Communicating to remote...")
         for day in days:
-            comm = Hiper.register_date(day, legajo, user_login)
+            comm = Hiper.register_date(day, conf.hiper["legajo"], conf.hiper["user"])
             if comm:
                 click.secho(f"{day.day_str()} informed correctly", fg="green")
             else:

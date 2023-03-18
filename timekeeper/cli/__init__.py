@@ -1,5 +1,4 @@
 """CLI interface module"""
-import os
 
 import click
 
@@ -7,7 +6,7 @@ from timekeeper.cli.drop import drop
 from timekeeper.cli.show import show
 from timekeeper.cli.start import start
 from timekeeper.cli.stop import stop
-from timekeeper.model import Times
+from timekeeper.config import Config
 
 
 @click.group(commands=[start, stop, show, drop])
@@ -16,10 +15,7 @@ from timekeeper.model import Times
 def cli(context=None) -> None:
     """CLI Runner group"""
 
-    home = os.path.expanduser("~")
-    database = os.path.join(home, "timekeeper.db")
-
-    context.obj = Times(database)
+    context.obj = Config()
 
 
 if __name__ == "__main__":

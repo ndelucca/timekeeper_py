@@ -2,7 +2,7 @@
 
 import click
 
-from timekeeper.model import Times
+from timekeeper.config import Config
 from timekeeper.notification import send_notification
 
 
@@ -15,11 +15,11 @@ from timekeeper.notification import send_notification
     default=None,
 )
 @click.pass_obj
-def start(times_model: Times, date: None) -> None:
+def start(conf: Config, date: None) -> None:
     """Signals the begining of the clock"""
     if date:
-        times_model.register_in(date)
+        conf.model.register_in(date)
     else:
-        times_model.register_in()
+        conf.model.register_in()
         send_notification("Hi Bro!")
         click.echo("Hi bro.")
