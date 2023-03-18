@@ -21,7 +21,7 @@ def open_db(db_name: str) -> Cursor:
         cursor = connection.cursor()
         yield cursor
     except DatabaseError as db_error:
-        logging.error(f"Database error: {db_error}")
+        logging.error("Database error: %s", db_error)
         raise TimekeeperDatabaseError() from db_error
     finally:
         connection.commit()
