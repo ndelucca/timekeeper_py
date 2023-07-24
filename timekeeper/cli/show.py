@@ -116,7 +116,7 @@ def show(
         click.echo("Communicating to remote...")
         for day in days:
             comm = Hiper.register_date(
-                day, session.hiper["legajo"], session.hiper["user"]
+                day, session.config.hiper["legajo"], session.config.hiper["user"]
             )
             if comm:
                 click.secho(f"{day.day_str()} informed correctly", fg="green")
