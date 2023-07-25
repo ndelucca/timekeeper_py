@@ -37,4 +37,3 @@ class Config:
         conf.read(configuration)
 
         self.hiper = conf["hiper"]
-        print(self.hiper)
