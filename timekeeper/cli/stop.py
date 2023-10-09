@@ -3,7 +3,6 @@
 import click
 
 from timekeeper.cli.session import CliSession
-from timekeeper.notification import send_notification
 
 
 @click.command()
@@ -21,5 +20,4 @@ def stop(session: CliSession, date: None) -> None:
         session.times_model.register_out(date)
     else:
         session.times_model.register_out()
-        send_notification("Bye Bro!")
         click.echo("Bye bro.")
