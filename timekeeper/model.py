@@ -9,7 +9,8 @@ from typing import Callable, List
 from timekeeper.database import open_db
 from timekeeper.times import now_rounded
 
-TABLE_NAME = "times"
+SESSION_TABLE_NAME = "session"
+TIMES_TABLE_NAME = "times"
 DATE_FMT = "%Y-%m-%d"
 TIME_FMT = "%H:%M"
 
@@ -73,13 +74,38 @@ class Day:
         """Returns the out time as a formated string"""
         return self.out_dt.strftime(TIME_FMT)
 
+class Session:
+    """Represents the remote login session"""
+    database: str
+    connection: Callable
+    table: str = SESSION_TABLE_NAME
+
+    def __init__(self, database):
+        self.database = database
+        self.connection = partial(open_db, database)
+
+        self.initialize_db()
+
+    def initialize_db(self) -> None:
+        """Creates the session tables"""
+        with self.connection() as cursor:
+            try:
+                cursor.execute(
+                    f"""CREATE TABLE IF NOT EXISTS `{self.table}` (
+                    id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    session_cookie TEXT
+                    );"""
+                )
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
 
 class Times:
     """Represents the timekeeping table model"""
 
     database: str
     connection: Callable
-    table: str = TABLE_NAME
+    table: str = TIMES_TABLE_NAME
 
     def __init__(self, database):
         self.database = database

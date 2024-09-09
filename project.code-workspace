@@ -1,7 +1,7 @@
 {
     "folders": [
         {
-            "path": ".."
+            "path": "."
         }
     ],
     "settings": {
@@ -10,7 +10,7 @@
         "editor.renderWhitespace": "all",
         "editor.tabSize": 4,
         "editor.codeActionsOnSave": {
-            "source.organizeImports": true,
+            "source.organizeImports": "explicit"
         },
         "editor.formatOnSave": true,
         "editor.rulers": [
@@ -20,10 +20,5 @@
         "workbench.colorCustomizations": {
             "titleBar.activeBackground": "#483c85"
         },
-        "python.linting.enabled": true,
-        "python.linting.pylintEnabled": true,
-        "python.linting.pylintPath": "${workspaceFolder}/.venv/bin/pylint",
-        "python.formatting.blackPath": "${workspaceFolder}/.venv/bin/black",
-        "python.formatting.provider": "black",
     }
 }

@@ -1,17 +1,34 @@
 import logging
+
 import requests
 
 from timekeeper.model import Day
 
 
 class Hiper:
-    url: str = "http://hiper.e-ducativa.x/aj_reloj.cgi"
-    accion: str = "validar_guardar_teletrabajo"
+    url: str = "http://hiper.e-ducativa.x"
+    session: str = None
 
-    @classmethod
-    def register_date(cls, day: Day, legajo: str, user_log: str) -> dict:
+    def login(self, username: str, password: str):
+        login_url = f"{self.url}/login.cgi"
         request_data = {
-            "accion": cls.accion,
+            "accion": "",
+            "usuario": username,
+            "password": password,
+        }
+
+        response = requests.post(
+            url=login_url,
+            headers={"Content-type": "multipart/form-data"},
+            data=request_data,
+        )
+
+        self.session = response.cookies
+
+    def register_date(self, day: Day, legajo: str, user_log: str) -> dict:
+        reloj_url = f"{self.url}/aj_reloj.cgi"
+        request_data = {
+            "accion": "validar_guardar_teletrabajo",
             "dia": day.day_str(),
             "entrada": day.time_in_str(),
             "salida": day.time_out_str(),
@@ -20,7 +37,7 @@ class Hiper:
 
         cookies = {"hiper_usr_log": user_log}
 
-        response = requests.post(url=cls.url, json=request_data, cookies=cookies)
+        response = requests.post(url=reloj_url, json=request_data, cookies=cookies)
 
         if response.status_code == 200 and response.text == '{"estado":1}':
             return True
