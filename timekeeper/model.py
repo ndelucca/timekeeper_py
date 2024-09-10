@@ -1,5 +1,6 @@
 """Database module"""
 
+import json
 import logging
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -74,8 +75,10 @@ class Day:
         """Returns the out time as a formated string"""
         return self.out_dt.strftime(TIME_FMT)
 
+
 class Session:
     """Represents the remote login session"""
+
     database: str
     connection: Callable
     table: str = SESSION_TABLE_NAME
@@ -95,6 +98,31 @@ class Session:
                     id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
                     session_cookie TEXT
                     );"""
+                )
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
+    def get_cookies(self) -> str:
+        with self.connection() as cursor:
+            query = f"SELECT `session_cookie` FROM `{self.table}` WHERE id = 1;"
+
+            try:
+                cursor.execute(query)
+                fetched_data = cursor.fetchone()
+                if fetched_data and fetched_data[0]:
+                    return json.loads(fetched_data[0])
+                return None
+            except Exception as db_error:
+                raise TimekeeperModelError from db_error
+
+    def set_cookies(self, cookies: str) -> None:
+        """Registers a row"""
+        parsed_cookies = json.dumps(cookies)
+        with self.connection() as cursor:
+            try:
+                cursor.execute(
+                    f"REPLACE INTO `{self.table}` (`session_cookie`) VALUES (?);",
+                    (parsed_cookies,),
                 )
             except Exception as db_error:
                 raise TimekeeperModelError from db_error

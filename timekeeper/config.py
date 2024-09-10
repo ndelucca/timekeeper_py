@@ -1,4 +1,5 @@
 """Configuration module"""
+
 import os
 from configparser import ConfigParser
 from dataclasses import dataclass, field
@@ -7,7 +8,6 @@ from click import ClickException
 
 CONFIG_TEMPLATE = """
 [hiper]
-legajo = 00
 user = USERNAME
 """
 

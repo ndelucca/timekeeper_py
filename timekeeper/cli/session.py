@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass, field
 
 from timekeeper.config import Config
-from timekeeper.model import Times
+from timekeeper.model import Session, Times
 
 
 @dataclass
@@ -21,3 +21,4 @@ class CliSession:
         database = os.path.join(home, "timekeeper.db")
 
         self.times_model = Times(database)
+        self.session_model = Session(database)

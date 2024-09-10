@@ -7,8 +7,9 @@ import click
 from tabulate import tabulate
 
 from timekeeper.cli.session import CliSession
-from timekeeper.remote import Hiper
 from timekeeper.model import Session
+from timekeeper.remote import Hiper
+
 
 def header_style(text: str) -> str:
     """Helper styling function"""
@@ -116,17 +117,20 @@ def show(
         click.echo("Communicating to remote...")
 
         remote = Hiper()
-        remote_session = Session()
 
-        if not remote_session.cookie:
-            remote.login(session.config.hiper["user"], session.config.hiper["user"])
-            if not remote.session:
+        if not session.session_model.get_cookies():
+            session_cookies = remote.login(
+                session.config.hiper["user"], session.config.hiper["user"]
+            )
+            if not session_cookies:
                 click.Abort("Could not login to Hiper")
-            remote_session.store_cookie(remote.session)
+
+            session.session_model.set_cookies(session_cookies)
 
         for day in days:
             comm = remote.register_date(
-                day, session.config.hiper["legajo"], session.config.hiper["user"], remote_session.cookie
+                day,
+                session.session_model.get_cookies(),
             )
             if comm:
                 click.secho(f"{day.day_str()} informed correctly", fg="green")
