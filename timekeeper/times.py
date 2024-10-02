@@ -1,4 +1,5 @@
 """Time management utils"""
+
 from datetime import datetime
 
 ROUND_INTERVAL = 5

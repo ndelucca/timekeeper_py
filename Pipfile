@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 timekeeper = {path = ".",editable = true}
+ruff = "*"
 
 [dev-packages]
 black = "*"
